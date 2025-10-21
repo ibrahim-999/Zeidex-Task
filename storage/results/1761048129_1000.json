@@ -1,9 +1,0 @@
-{
-    "limit": 1000,
-    "execution_time": 0,
-    "memory_usage": 0.03,
-    "prime_count": 168,
-    "avg_gap": 5.96,
-    "max_gap": 20,
-    "complexity": "O(n log log n)"
-}
