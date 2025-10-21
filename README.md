@@ -1,61 +1,192 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Zeidex Assignment
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel 12 application implementing prime number analysis and transaction reporting with advanced querying capabilities.
 
-## About Laravel
+## Project Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Task 1: Prime Number Analysis
+Console command that generates prime numbers using the Sieve of Eratosthenes algorithm, calculates statistical metrics (count, gaps, execution time, memory usage), and stores results in JSON format for aggregation analysis.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Task 2: Transaction Reporting
+Advanced database querying system with multi-table joins, aggregations, filtering, and pagination. Includes caching for performance optimization and RESTful API with resources and collections.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Quick Start with Docker
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Prerequisites
+- Docker
+- Docker Compose
+- Make
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Setup
+```bash
+  make setup
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Or manually if you want:
+```bash
+  docker-compose up -d
+  docker-compose exec app composer install
+  docker-compose exec app cp .env.docker .env
+  docker-compose exec app php artisan key:generate
+  docker-compose exec app php artisan migrate:fresh --seed
+```
 
-## Laravel Sponsors
+Access at: **http://localhost:8000**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Usage Examples
 
-### Premium Partners
+### Task 1: Prime Analysis
+```bash
+  docker-compose exec app php artisan primes:analyze 100000
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+**Output:**
+```
+Analyzing primes up to 100000
 
-## Contributing
+Total Primes: 9592
+Average Gap: 10.43
+Max Gap: 114
+Execution Time: 0.0234s
+Memory Usage: 1.15MB
+Estimated Time Complexity: O(n log log n)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Results saved to 1729512345_100000.json for example
+```
 
-## Code of Conduct
+**JSON Result** (stored in `storage/results/`):
+```json
+{
+  "limit": 100000,
+  "execution_time": 0.0234,
+  "memory_usage": 1.15,
+  "prime_count": 9592,
+  "avg_gap": 10.43,
+  "max_gap": 114,
+  "complexity": "O(n log log n)"
+}
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Example Screenshots:**
+- See `prime-test.png` in project root
+- See `aggregation.png` in project root
 
-## Security Vulnerabilities
+### Task 2: Transaction Report
+```bash
+curl http://localhost:8000/api/v1/transaction-report
+curl http://localhost:8000/api/v1/transaction-report?per_page=5
+curl http://localhost:8000/api/v1/transaction-report?date_from=2025-10-01&date_to=2025-10-31
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Output:**
+```json
+{
+  "data": [
+    {
+      "user": "Younis Jad",
+      "total_deposits": "12,200.00",
+      "total_withdrawals": "2,000.00",
+      "net_balance": "10,200.00"
+    }
+  ],
+  "meta": {
+    "total": 10,
+    "per_page": 10,
+    "current_page": 1,
+    "last_page": 1
+  }
+}
+```
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Algorithm & Design Choices
+
+### Sieve of Eratosthenes
+**Why:** Most efficient algorithm for finding all primes up to n. Eliminates multiples of each prime systematically.
+
+**Alternatives Considered:**
+- Trial Division: O(n√n) - too slow for large n
+- Segmented Sieve: More complex, unnecessary for limits < 10^7
+
+**Implementation:** Boolean array tracks primality, iterates up to √n marking multiples.
+
+### Database Query Design
+**Why:** Single query with JOINs and aggregations minimizes database round trips.
+
+**Alternatives Considered:**
+- Separate queries per user: N+1 problem
+- Eloquent relationships only: Less efficient for aggregations
+
+**Implementation:** Raw SQL with CASE statements for conditional sums, HAVING for filtering aggregated results.
+
+### Caching Strategy
+**Why:** Transaction reports rarely change, cache reduces database load.
+
+**Implementation:** Key-based caching with 1-hour TTL based on query parameters.
+
+---
+
+## Time Complexity Analysis
+
+### Task 1: Sieve of Eratosthenes
+
+**Time Complexity: O(n log log n)**
+
+The algorithm marks multiples of each prime up to √n:
+- Outer loop: √n iterations
+- Inner loop: n/p operations for prime p
+- Sum: n × (1/2 + 1/3 + 1/5 + ...) ≈ n log log n
+
+**Space Complexity: O(n)**
+- Boolean array of size n
+
+**Measured Performance:**
+| Input | Primes | Time | Memory |
+|-------|--------|------|--------|
+| 100 | 25 | ~0.001s | 0.01MB |
+| 10,000 | 1,229 | ~0.005s | 0.2MB |
+| 100,000 | 9,592 | ~0.045s | 1.2MB |
+| 1,000,000 | 78,498 | ~0.5s | 12MB |
+
+### Task 2: Database Query
+
+**Time Complexity: O(t + u log u)**
+
+Where t = transactions, u = users:
+- JOIN operations: O(u + a + t) where a = accounts
+- GROUP BY: O(t)
+- HAVING filter: O(u)
+- ORDER BY: O(u log u)
+
+**Space Complexity: O(u)**
+- Result set contains one row per user
+
+**Optimization:**
+- Indexed foreign keys for fast joins
+- Single query eliminates N+1 problem
+- Caching reduces repeated queries to O(1)
+
+---
+
+## Testing
+```bash
+  make test
+```
+
+**Coverage:**
+- Unit tests: Services, models, algorithms
+- Feature tests: API endpoints, commands
+- Integration tests: Database relationships
+
+---
+## Requirements Without Docker
+
+- PHP 8.2+
+- Laravel 12
+- MySQL 8.0 or SQLite
+- Redis (for caching)
+- Composer
+
